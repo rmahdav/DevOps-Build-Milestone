@@ -1,0 +1,129 @@
+---
+- hosts:
+    - main
+
+  vars: 
+    packages:
+      - git
+      - nginx
+      - python-pip
+      - python3-lxml
+      - mongodb-org
+
+    pippackages:
+      - python-jenkins
+      - lxml
+
+    MONGO_USER: "{{ lookup('env','MONGO_USER') }}"
+    MONGO_PASSWORD: "{{ lookup('env','MONGO_PASSWORD') }}"
+    MAIL_USER: "{{ lookup('env','MAIL_USER') }}"
+    MAIL_PASSWORD: "{{ lookup('env','MAIL_PASSWORD') }}"
+    MAIL_SMTP: "{{ lookup('env','MAIL_SMTP') }}"
+
+  tasks:
+    - name: Add environment variables
+      template:
+        src: templates/variables
+        dest: /etc/environment
+      become: yes
+
+      # Restart the server to set environment variables
+    - name: Restarting Server
+      become: yes
+      shell: sleep 2 && /sbin/shutdown -r now "Ansible system package upgraded"
+      async: 1
+      poll: 0
+      
+      # Wait for server to reboot
+    - name: Wait for reboot
+      local_action: wait_for host={{ inventory_hostname }} port=22 delay=10 state=started
+      become: false
+
+    - name: Get nodejs package
+      shell: curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+
+    - name: import mongodb public KEY
+      apt_key: 
+        id: 2930ADAE8CAF5059EE73BB4B58712A2291FA4AD5  
+        keyserver: keyserver.ubuntu.com
+
+    - name: Create a list file for mongodb
+      apt_repository:
+        repo: 'deb https://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.6 multiverse' 
+        state: present
+
+    - name: Install apt packages
+      become: yes
+      apt: 
+        pkg: "{{ item }}"
+        state: present
+        update_cache: yes
+      with_items: "{{ packages }}"
+
+    - name: Install pip packages
+      become: yes
+      pip:
+        name: "{{ item }}"
+        state: present
+      with_items: "{{ pippackages }}"
+
+    - name: install forever
+      npm: 
+        name: forever
+        global: yes
+        state: present
+
+    - name: Start mongodb service
+      command: service mongod start
+      become: yes
+
+    - name: install python setuptools
+      apt: pkg=python-setuptools state=present
+      become: yes
+
+    - name: install pymongo
+      shell: python -m easy_install pymongo
+      become: yes
+
+    - name: Add id_rsa
+      copy:
+        src: keys/id_rsa
+        dest: /var/lib/jenkins/.ssh/
+        mode: 0600
+        owner: jenkins
+
+    - name: create mongodb admin user
+      mongodb_user:
+        database: admin
+        name: "{{MONGO_USER}}"
+        password: "{{MONGO_PASSWORD}}"
+        roles:
+          - { db: "admin", role: "readWrite" }
+          - { db: "admin", role: "dbAdmin" }
+          - { db: "admin", role: "userAdmin" }
+        login_port: 27017
+        state: present
+    
+    - name: Add default file to nginx
+      template: 
+        src: templates/default
+        dest: /etc/nginx/sites-available/default
+      become: yes
+
+    - name: Add nginx.config file to nginx
+      template:
+        src: templates/nginx.config
+        dest: /etc/nginx/nginx.conf
+      become: yes
+
+    - name: reload nginx
+      shell: nginx -s reload
+      become: yes
+
+    - name: Add Jenkins job (Checkbox)
+      jenkins_job:
+        config: "{{ lookup('file', 'Checkbox.xml') }}"
+        name: Checkbox
+        password: 4500274d434c4307a3b864806223b577
+        url: http://localhost:8080/
+        user: admin
