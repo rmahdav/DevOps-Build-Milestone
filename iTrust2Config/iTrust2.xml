@@ -38,7 +38,7 @@ cp ../templates/db.properties iTrust2/src/main/resources/db.properties
 cp ../templates/email.properties iTrust2/src/main/resources/email.properties
 cp ../templates/.my.cnf iTrust2/src/main/resources/.my.cnf
 cd iTrust2/
-mvn clean install</command>
+mvn clean test verify checkstyle:checkstyle</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>
