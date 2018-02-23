@@ -12,6 +12,10 @@ Repository for our groups Configuration Management Build Milestone
 
 ## Configuration Management Build Milestone
 
+### Setting up Jenkins and its Configuration
+
+setUpJenkins_playbook.yml is the playbook which automates setting up Jenkins on a VM. It makes use of a groovy script, named jenkins_script.groovy.j2 for the purpose of creating a sample user named admin, with his password as admin.
+
 ### Checkbox Configuration
 
 To configure Checkbox.io we have following files:
