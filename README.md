@@ -52,4 +52,7 @@ To configure Checkbox.io we have following files:
 
 After running checkbox.yml on inventory file, Checkbox.io is accessible using the ip address of the server.
 
+### iTrust Setup
+One of the more difficult tasks in automating the process of building and starting iTrust automatically involved setting up the digital ocean server and provided the necessary foundations for ansible to take of the process. I had to devise a technique using node that allowed me to automatically install python on the DO droplet so that ansible could run without intervention. I also was required to dynamically generate the ansible inventory file with the corresponding IP address of the newly created droplet along with the ssh key path that would provide ansible access to the droplet. The actual building of the iTrust components was not that bad. The most difficult aspect of this was ensuring that all required configuration files were being modified and storing the appropriate information, such as usernames and passwords, which were stored in environment variables. Having the environment variables be available for the jenkins server while not exposing sensitive information was also a problem that I had to surmount. This was accomplished by putting all sensitive environment variables in a seperate file that the host would export to the jenkins server.
+
 ## Screencast
