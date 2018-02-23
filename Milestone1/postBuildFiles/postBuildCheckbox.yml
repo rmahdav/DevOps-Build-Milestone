@@ -1,31 +1,19 @@
 ---
-- name: checkbox_config
-  hosts: checkbox
+- hosts: Checkbox
+
   gather_facts: no
-  vars_prompt:
-    - name: "MONGO_USER"
-      prompt: "Enter your mongodb admin username"
-      private: no
-    - name: "MONGO_PASSWORD"
-      prompt: "Enter your mongodb admin password"
-      private: yes
-    - name: "MAIL_USER"
-      prompt: "Enter your email address for mail server"
-      private: no
-    - name: "MAIL_PASSWORD"
-      prompt: "Enter your email password for mail server"
-      private: yes
-    - name: "MAIL_SMTP"
-      prompt: "Enter the smtp host"
-      private: no
+
+  vars:
+    MONGO_USER: "{{ lookup('env','MONGO_USER') }}"
+    MONGO_PASSWORD: "{{ lookup('env','MONGO_PASSWORD') }}"
+    MAIL_USER: "{{ lookup('env','MAIL_USER') }}"
+    MAIL_PASSWORD: "{{ lookup('env','MAIL_PASSWORD') }}"
+    MAIL_SMTP: "{{ lookup('env','MAIL_SMTP') }}"
+  
   tasks:
       # Install python to use ansible
     - name: install python 2
       raw: test -e /usr/bin/python || (sudo apt -y update && sudo apt install -y python-minimal)
-      # Add environment variables to /etc/enviroment files using template
-    - name: Add environment variables
-      template: src=./templates/variables dest=/etc/environment
-      become: yes
       # Restart the server to set environment variables
     - name: Restarting Server
       become: yes
@@ -106,11 +94,11 @@
       file: dest=/root/checkbox/public_html mode=+x
       # Add default file to /etc/nginx/sites-available using template
     - name: Add default file to nginx
-      template: src=./templates/default dest=/etc/nginx/sites-available/default
+      template: src=/var/lib/jenkins/workspace/templates/default dest=/etc/nginx/sites-available/default
       become: yes
       # Add nginx.config file to /etc/nginx using template
     - name: Add nginx.config file to nginx
-      template: src=./templates/nginx.config dest=/etc/nginx/nginx.conf
+      template: src=/var/lib/jenkins/workspace/templates/nginx.config dest=/etc/nginx/nginx.conf
       become: yes
       # Reload nginx to apply new configuration
     - name: reload nginx

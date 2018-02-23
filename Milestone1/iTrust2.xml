@@ -33,14 +33,32 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>cp ../templates/hibernate.properties iTrust2/src/main/resources/hibernate.properties
-cp ../templates/db.properties iTrust2/src/main/resources/db.properties
-cp ../templates/email.properties iTrust2/src/main/resources/email.properties
-cp ../templates/.my.cnf iTrust2/src/main/resources/.my.cnf
-cd iTrust2/
+      <command>cp /var/lib/jenkins/workspace/templates/hibernate.properties /var/lib/jenkins/jobs/iTrust2/workspace/iTrust2/src/main/resources/hibernate.properties
+cp /var/lib/jenkins/workspace/templates/db.properties /var/lib/jenkins/jobs/iTrust2/workspace/iTrust2/src/main/resources/db.properties
+cp /var/lib/jenkins/workspace/templates/email.properties /var/lib/jenkins/jobs/iTrust2/workspace/iTrust2/src/main/resources/email.properties
+cd /var/lib/jenkins/jobs/iTrust2/workspace/iTrust2
 mvn clean test verify checkstyle:checkstyle</command>
     </hudson.tasks.Shell>
   </builders>
-  <publishers/>
+  <publishers>
+    <org.jenkinsci.plugins.postbuildscript.PostBuildScript plugin="postbuildscript@2.5.1">
+      <config>
+        <scriptFiles>
+          <org.jenkinsci.plugins.postbuildscript.model.ScriptFile>
+            <results>
+              <string>SUCCESS</string>
+            </results>
+            <role>BOTH</role>
+            <filePath>/var/lib/jenkins/workspace/postBuild/runITrust.sh</filePath>
+            <scriptType>GENERIC</scriptType>
+            <sandboxed>false</sandboxed>
+          </org.jenkinsci.plugins.postbuildscript.model.ScriptFile>
+        </scriptFiles>
+        <groovyScripts/>
+        <buildSteps/>
+        <markBuildUnstable>false</markBuildUnstable>
+      </config>
+    </org.jenkinsci.plugins.postbuildscript.PostBuildScript>
+  </publishers>
   <buildWrappers/>
 </project>

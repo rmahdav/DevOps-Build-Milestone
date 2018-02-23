@@ -37,6 +37,25 @@
 npm install</command>
     </hudson.tasks.Shell>
   </builders>
-  <publishers/>
+  <publishers>
+    <org.jenkinsci.plugins.postbuildscript.PostBuildScript plugin="postbuildscript@2.5.1">
+      <config>
+        <scriptFiles>
+          <org.jenkinsci.plugins.postbuildscript.model.ScriptFile>
+            <results>
+              <string>SUCCESS</string>
+            </results>
+            <role>BOTH</role>
+            <filePath>/var/lib/jenkins/workspace/postBuild/runCheckbox.sh</filePath>
+            <scriptType>GENERIC</scriptType>
+            <sandboxed>false</sandboxed>
+          </org.jenkinsci.plugins.postbuildscript.model.ScriptFile>
+        </scriptFiles>
+        <groovyScripts/>
+        <buildSteps/>
+        <markBuildUnstable>false</markBuildUnstable>
+      </config>
+    </org.jenkinsci.plugins.postbuildscript.PostBuildScript>
+  </publishers>
   <buildWrappers/>
 </project>

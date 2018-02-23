@@ -10,15 +10,6 @@ Repository for our groups Configuration Management Build Milestone
 | Kunal Kulkarni | krkulkar | Jenkins automation
 | Rezvan Mahdavi Hezaveh  |  rmahdav |   checkbox.io post-build configuration
 
-To replicate - make sure to set appropriate environment variables on host machine
-Environment varibles are also required for the Jenkins server which are stored in templates/variables (not included in the repo for security purposes). These variables are added when setting up Jenkins build jobs and are used later during post-build actions.
-
-* To create a node for Jenkins - node mainDO.js
-* To setup jenkins on above node - ansible-playbook -i inventory setUpJenkins_playbook.yml -l main
-* To create iTrust2 build on Jenkins server - ansible-playbook -i inventory iTrust2.yml -l main
-* To create Checkbox build on Jenkins server - ansible-playbook -i inventory Checkbox.yml -l main
-  * Keys needed for Jenkins and VMs created in post-build actions are stored in a keys directory (not included for security purposes)
-
 ## Configuration Management Build Milestone
 
 ### Setting up Jenkins and its Configuration
@@ -27,7 +18,7 @@ setUpJenkins_playbook.yml is the playbook which automates setting up Jenkins on 
 
 ### Checkbox.io + iTrust.io build jobs
 
-This part included created the Checkbox and iTrust build jobs on the Jenkins server. Then, running these jobs and having the post-build actions start VMs with the appropriate applications running. The difficult part here was first getting the Jenkins jobs manually setup so that XML for the job can be retrieved after. Main issues were face during the post-build action when the appropriate tokens/passwords were needed from the host machine to be able to allow ansible to configure and the applications and have them running. One particular issue faced was setting up a jenkins user on mysql. Root was unable to receive grant privileges with Ansible and I had to come up with a workaround.
+
 
 ### Checkbox Configuration
 

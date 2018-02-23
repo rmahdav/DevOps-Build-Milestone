@@ -1,5 +1,5 @@
 ---
-- hosts: node0
+- hosts: main
 
   vars:
     packages:
@@ -7,18 +7,18 @@
       - git-core
       - gcc
       - default-jdk
-      - openjdk-7-jdk
       - git
       - maven
 
     jenkins_java_args: 'JAVA_ARGS="-Djava.awt.headless=true -Djenkins.install.runSetupWizard=false"'
     jenkins_home: /var/lib/jenkins
-    jenkins_hostname: 192.168.33.4
+    jenkins_hostname: localhost
     jenkins_http_port: 8080
     jenkins_admin_username: admin
     jenkins_admin_password: admin
-    jenkins_jar_location: /home/vagrant/jenkins-cli.jar
+    jenkins_jar_location: /root/jenkins-cli.jar
     jenkins_default_file: /etc/default/jenkins
+    host_path: /Users/akshitpatel/Desktop/School/CSC519/Milestone1/
     jenkins_params:
       url_username: "{{ jenkins_admin_username }}"
       validate_certs: no
@@ -97,7 +97,7 @@
       - name: Copying Groovy Script For Default Jenkins User Creation
         template:
           force: yes
-          src: "/home/vagrant/jenkins_script.groovy.j2"
+          src: "/jenkins_script.groovy.j2"
           dest: "{{ jenkins_home }}/init.groovy.d/basic-security.groovy"
           mode: 0755
         become: yes
@@ -115,6 +115,32 @@
           state: absent
         become: yes
 
+      - name: fix a defect to disable setup wizard
+        jenkins_script:
+          script: |
+            import static jenkins.model.Jenkins.instance as jenkins
+            import jenkins.install.InstallState
+            if (!jenkins.installState.isSetupComplete()) {
+              InstallState.INITIAL_SETUP_COMPLETED.initializeState()
+            }
+          user: "{{ jenkins_admin_username }}"
+          password: "{{ jenkins_admin_password }}"
+
+      - name: Get Jenkins client Jar file
+        get_url:
+          url: http://{{ jenkins_hostname }}:{{ jenkins_http_port }}/jnlpJars/jenkins-cli.jar
+          dest: /root/
+          mode: 755
+        become: yes
+
+      - name: Immediately restart jenkins
+        service: name=jenkins state=restarted
+        become: yes
+
+      - name: Wait for jenkins to start
+        wait_for: port={{ jenkins_http_port }} delay=30
+        become: yes
+
       - name: Run a script to disable setup wizard
         jenkins_script:
           script: |
@@ -129,7 +155,7 @@
       - name: Get Jenkins client Jar file
         get_url:
           url: http://{{ jenkins_hostname }}:{{ jenkins_http_port }}/jnlpJars/jenkins-cli.jar
-          dest: /home/vagrant/
+          dest: /root/
           mode: 755
         become: yes
 
@@ -149,7 +175,6 @@
           - build-timeout
           - postbuild-task
         register: jenkins_plugins
-        become: yes
 
       - name: Checking Jenkins State
         service:
@@ -165,3 +190,59 @@
           host: "{{ jenkins_hostname }}"
           port: "{{ jenkins_http_port }}"
           delay: 30
+
+      - name: Create target directory
+        file: 
+          path: /var/lib/jenkins/workspace/postBuild
+          state: directory
+          mode: 0755
+          owner: jenkins
+
+      - name: Copy mainDOITrust.js
+        copy:
+          src: postBuildFiles/mainDOITrust.js
+          dest: "{{jenkins_home}}/workspace/postBuild/"
+          owner: jenkins
+          mode: 0644
+
+      - name: Copy mainDOCheckbox.js
+        copy:
+          src: postBuildFiles/mainDOCheckbox.js
+          dest: "{{jenkins_home}}/workspace/postBuild/"
+          owner: jenkins
+          mode: 0644
+
+      - name: Copy iTrust.yml
+        copy:
+          src: postBuildFiles/postBuildITrust.yml
+          dest: "{{jenkins_home}}/workspace/postBuild/"
+          owner: jenkins
+          mode: 0644
+
+      - name: Copy Checkbox.yml
+        copy:
+          src: postBuildFiles/postBuildCheckbox.yml
+          dest: "{{jenkins_home}}/workspace/postBuild/"
+          owner: jenkins
+          mode: 0644
+
+      - name: Copy package.json
+        copy:
+          src: postBuildFiles/package.json
+          dest: "{{jenkins_home}}/workspace/postBuild/"
+          owner: jenkins
+          mode: 0644
+
+      - name: Copy runITrust.sh
+        copy:
+          src: postBuildFiles/runITrust.sh
+          dest: "{{jenkins_home}}/workspace/postBuild/"
+          owner: jenkins
+          mode: 0755
+
+      - name: Copy runCheckbox.sh
+        copy:
+          src: postBuildFiles/runCheckbox.sh
+          dest: "{{jenkins_home}}/workspace/postBuild/"
+          owner: jenkins
+          mode: 0755
