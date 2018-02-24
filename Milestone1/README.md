@@ -16,6 +16,11 @@ Repository for our groups Configuration Management Build Milestone
 
 setUpJenkins_playbook.yml is the playbook which automates setting up Jenkins on a VM. It makes use of a groovy script, named jenkins_script.groovy.j2 for the purpose of creating a sample user named admin, with his password as admin.
 
+#### Challenges faced:
+* Restarting Jenkins: While executing the Groovy script & installing Jenkins plugins, the task was failing every time. After investing a lot of time in this particular issue, we found that after any kind of configuration change in Jenkins, we need to restart it, so that the latest changes take effect.
+
+* Disabling the setup wizard: This particular task took up a lot of time. We were able to create a sample user via the Groovy script and the initial wizard asking for the default password was skipped. However, the next plugin wizard was still appearing. We finally wrote a script that enabled us to skip plugin wizard from appearing.
+
 ### Checkbox.io + iTrust.io build jobs
 
 
