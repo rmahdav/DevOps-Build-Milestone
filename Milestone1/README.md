@@ -12,11 +12,11 @@ Repository for our groups Configuration Management Build Milestone
 
 To replicate - make sure to set appropriate environment variables on host machine Environment varibles are also required for the Jenkins server which are stored in templates/variables (not included in the repo for security purposes). These variables are added when setting up Jenkins build jobs and are used later during post-build actions.
 
-To create a node for Jenkins - node mainDO.js
-To setup jenkins on above node - ansible-playbook -i inventory setUpJenkins_playbook.yml -l main
-To create iTrust2 build on Jenkins server - ansible-playbook -i inventory iTrust2.yml -l main
-To create Checkbox build on Jenkins server - ansible-playbook -i inventory Checkbox.yml -l main
-Keys needed for Jenkins and VMs created in post-build actions are stored in a keys directory (not included for security purposes)
+To create a node for Jenkins - node mainDO.js  
+To setup jenkins on above node - ansible-playbook -i inventory setUpJenkins_playbook.yml -l main  
+To create iTrust2 build on Jenkins server - ansible-playbook -i inventory iTrust2.yml -l main  
+To create Checkbox build on Jenkins server - ansible-playbook -i inventory Checkbox.yml -l main  
+Keys needed for Jenkins and VMs created in post-build actions are stored in a keys directory (not included for security purposes)  
 
 ## Configuration Management Build Milestone
 
