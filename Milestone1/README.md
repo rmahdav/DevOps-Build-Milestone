@@ -35,7 +35,7 @@ To configure Checkbox.io we have following files:
   - Configure nginx: We changed the root path in the default file and then added it to /etc/nginx/sites-available.
   - Change permissions: To have the running checkbox we had to change permission of the /root/checkbox/public_html and make it executable. We applied chmod +x to /root/ , /root/checkbox and /root/checkbox/public_html.
 
-After running checkbox.yml on inventory file, Checkbox.io is accessible using the ip address of the server.
+After running checkbox.yml on inventory file, Checkbox.io is accessible using the ip address of the digital ocean droplet.
 
 ### iTrust Setup
 
